@@ -112,4 +112,4 @@ plt.title('Receiver Operating Characteristic (ROC) Curve')
 plt.legend(loc="lower right")
 st.pyplot(plt.gcf())
 
-st.sidebar.write("Developed by [Your Name]")
+st.sidebar.write("Developed by Subaranjani T")
