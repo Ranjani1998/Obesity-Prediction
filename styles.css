@@ -1,0 +1,17 @@
+/* styles.css */
+body {
+    background: url('assets/background1.jpg') no-repeat center center fixed;
+    background-size: cover;
+    color: #FFFFFF; /* Set text color to white for better readability */
+}
+
+.sidebar .sidebar-content {
+    background: url('assets/background2.jpg') no-repeat center center fixed;
+    background-size: cover;
+}
+
+footer {
+    background: url('assets/background3.jpg') no-repeat center center fixed;
+    background-size: cover;
+    color: #FFFFFF;
+}
