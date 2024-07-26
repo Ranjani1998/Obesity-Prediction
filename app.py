@@ -7,8 +7,9 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, classification_report, roc_curve, auc
+import base64
 
-# Load dataset
+# Function to load dataset
 @st.cache
 def load_data():
     url = 'https://raw.githubusercontent.com/jbrownlee/Datasets/master/pima-indians-diabetes.data.csv'
@@ -16,11 +17,31 @@ def load_data():
     data = pd.read_csv(url, names=columns)
     return data
 
+# Function to add background image from local file
+def add_bg_from_local(image_file):
+    with open(image_file, "rb") as image:
+        encoded = base64.b64encode(image.read()).decode()
+    st.markdown(
+        f"""
+        <style>
+        .stApp {{
+            background-image: url(data:image/jpeg;base64,{encoded});
+            background-size: cover;
+        }}
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+# Load the data
 data = load_data()
 
 # Sidebar
 st.sidebar.title("Pima Indians Diabetes Dataset")
 st.sidebar.write("This dataset is used to predict the onset of diabetes based on diagnostic measurements.")
+
+# Add background image
+add_bg_from_local('assets/background1.jpg')
 
 # Display the data
 if st.sidebar.checkbox("Show raw data"):
