@@ -1,16 +1,13 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, classification_report, roc_curve, auc
 import base64
-import os
 
-# Function to load dataset
+# Load and preprocess the dataset
 @st.cache
 def load_data():
     url = 'https://raw.githubusercontent.com/jbrownlee/Datasets/master/pima-indians-diabetes.data.csv'
@@ -18,102 +15,80 @@ def load_data():
     data = pd.read_csv(url, names=columns)
     return data
 
-# Function to add background image from local file
-def add_bg_from_local(image_file):
-    if os.path.isfile(image_file):
-        with open(image_file, "rb") as image:
-            encoded = base64.b64encode(image.read()).decode()
-        st.markdown(
-            f"""
-            <style>
-            .stApp {{
-                background-image: url(data:image/jpeg;base64,{encoded});
-                background-size: cover;
-            }}
-            </style>
-            """,
-            unsafe_allow_html=True
-        )
-    else:
-        st.error(f"File not found: {image_file}")
+# Function to add background image with transparency
+def add_bg_from_local(image_file, transparency):
+    with open(image_file, "rb") as image:
+        encoded = base64.b64encode(image.read()).decode()
+    st.markdown(
+        f"""
+        <style>
+        .stApp {{
+            background-image: url(data:image/jpeg;base64,{encoded});
+            background-size: cover;
+            opacity: {transparency};
+        }}
+        .stApp h1 {{
+            color: black;
+        }}
+        .stApp .stButton>button {{
+            background-color: #4CAF50; /* Green */
+            border: none;
+            color: white;
+            padding: 10px 24px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+        }}
+        .stApp .stTextInput>div>input {{
+            border: 2px solid #000;
+            padding: 10px;
+        }}
+        .stApp .stTextInput>div>label {{
+            font-weight: bold;
+            color: #000;
+        }}
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
 
-# Load the data
+# Load data and preprocess
 data = load_data()
-
-# Sidebar
-st.sidebar.title("Pima Indians Diabetes Dataset")
-st.sidebar.write("This dataset is used to predict the onset of diabetes based on diagnostic measurements.")
-
-# Add background image
-add_bg_from_local('assets/background1.jpg')
-
-# Display the data
-if st.sidebar.checkbox("Show raw data"):
-    st.subheader("Pima Indians Diabetes Dataset")
-    st.write(data)
-
-# Data Preprocessing
-data[['Glucose', 'BloodPressure', 'SkinThickness', 'Insulin', 'BMI']] = data[['Glucose', 'BloodPressure', 'SkinThickness', 'Insulin', 'BMI']].replace(0, np.nan)
-data.fillna(data.median(), inplace=True)
-
-# Feature Distribution
-if st.sidebar.checkbox("Show feature distributions"):
-    st.subheader("Feature Distributions")
-    data.hist(bins=15, figsize=(15, 10), layout=(3, 3))
-    st.pyplot(plt.gcf())
-
-# Correlation Heatmap
-if st.sidebar.checkbox("Show correlation heatmap"):
-    st.subheader("Correlation Heatmap")
-    correlation_matrix = data.corr()
-    plt.figure(figsize=(12, 8))
-    sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', linewidths=0.5)
-    st.pyplot(plt.gcf())
-
-# Pair Plot
-if st.sidebar.checkbox("Show pair plot"):
-    st.subheader("Pair Plot of Features")
-    sns.pairplot(data, hue='Outcome', diag_kind='kde', markers=['o', 's'])
-    st.pyplot(plt.gcf())
-
-# Data Normalization
 X = data.drop('Outcome', axis=1)
 y = data['Outcome']
 scaler = StandardScaler()
 X_scaled = scaler.fit_transform(X)
-
-# Split data into training and testing sets
 X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42)
-
-# Model Training
 model = LogisticRegression()
 model.fit(X_train, y_train)
 
-# Model Evaluation
-y_pred = model.predict(X_test)
-accuracy = accuracy_score(y_test, y_pred)
-report = classification_report(y_test, y_pred)
+# Add background image
+add_bg_from_local('assets/background1.jpg', transparency=0.3)
 
-# Display model performance
-st.subheader("Model Performance")
-st.write(f"Accuracy: {accuracy}")
-st.write("Classification Report:")
-st.text(report)
+# Streamlit UI
+st.title("Obesity Prediction App")
+st.write("Enter the details below to predict if you have obesity or not.")
 
-# ROC Curve
-y_prob = model.predict_proba(X_test)[:, 1]
-fpr, tpr, thresholds = roc_curve(y_test, y_prob)
-roc_auc = auc(fpr, tpr)
+# User input
+pregnancies = st.number_input('Pregnancies', min_value=0, max_value=20, value=0, step=1)
+glucose = st.number_input('Glucose Level', min_value=0, max_value=200, value=120, step=1)
+blood_pressure = st.number_input('Blood Pressure (mm Hg)', min_value=0, max_value=150, value=80, step=1)
+skin_thickness = st.number_input('Skin Thickness (mm)', min_value=0, max_value=100, value=20, step=1)
+insulin = st.number_input('Insulin Level (mu U/ml)', min_value=0, max_value=900, value=80, step=1)
+bmi = st.number_input('BMI', min_value=0.0, max_value=70.0, value=25.0, step=0.1)
+dpf = st.number_input('Diabetes Pedigree Function', min_value=0.0, max_value=3.0, value=0.5, step=0.01)
+age = st.number_input('Age', min_value=0, max_value=120, value=25, step=1)
 
-plt.figure(figsize=(8, 6))
-plt.plot(fpr, tpr, color='darkorange', lw=2, label=f'ROC curve (area = {roc_auc:.2f})')
-plt.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--')
-plt.xlim([0.0, 1.0])
-plt.ylim([0.0, 1.05])
-plt.xlabel('False Positive Rate')
-plt.ylabel('True Positive Rate')
-plt.title('Receiver Operating Characteristic (ROC) Curve')
-plt.legend(loc="lower right")
-st.pyplot(plt.gcf())
+# Prediction
+user_data = np.array([[pregnancies, glucose, blood_pressure, skin_thickness, insulin, bmi, dpf, age]])
+user_data_scaled = scaler.transform(user_data)
+prediction = model.predict(user_data_scaled)
+result = "You have obesity." if prediction[0] == 1 else "You do not have obesity."
 
-st.sidebar.write("Developed by Subaranjani T")
+# Display result
+if st.button('Predict'):
+    st.subheader("Prediction Result:")
+    st.markdown(f"<h1 style='color:red;'>{result}</h1>", unsafe_allow_html=True)
