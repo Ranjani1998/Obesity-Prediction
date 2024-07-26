@@ -8,6 +8,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, classification_report, roc_curve, auc
 import base64
+import os
 
 # Function to load dataset
 @st.cache
@@ -19,19 +20,22 @@ def load_data():
 
 # Function to add background image from local file
 def add_bg_from_local(image_file):
-    with open(image_file, "rb") as image:
-        encoded = base64.b64encode(image.read()).decode()
-    st.markdown(
-        f"""
-        <style>
-        .stApp {{
-            background-image: url(data:image/jpeg;base64,{encoded});
-            background-size: cover;
-        }}
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
+    if os.path.isfile(image_file):
+        with open(image_file, "rb") as image:
+            encoded = base64.b64encode(image.read()).decode()
+        st.markdown(
+            f"""
+            <style>
+            .stApp {{
+                background-image: url(data:image/jpeg;base64,{encoded});
+                background-size: cover;
+            }}
+            </style>
+            """,
+            unsafe_allow_html=True
+        )
+    else:
+        st.error(f"File not found: {image_file}")
 
 # Load the data
 data = load_data()
