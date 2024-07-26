@@ -4,7 +4,6 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score, classification_report, roc_curve, auc
 import base64
 
 # Load and preprocess the dataset
@@ -16,19 +15,19 @@ def load_data():
     return data
 
 # Function to add background image with transparency
-def add_bg_from_local(image_file, transparency):
+def add_bg_from_local(image_file):
     with open(image_file, "rb") as image:
         encoded = base64.b64encode(image.read()).decode()
     st.markdown(
         f"""
         <style>
         .stApp {{
-            background-image: url(data:image/jpeg;base64,{encoded});
+            background: linear-gradient(rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.5)), url(data:image/jpeg;base64,{encoded});
             background-size: cover;
-            opacity: {transparency};
         }}
-        .stApp h1 {{
-            color: black;
+        .stApp h1, .stApp h2, .stApp h3, .stApp h4, .stApp h5, .stApp h6, .stApp p {{
+            color: #000000 !important;
+            font-weight: bold;
         }}
         .stApp .stButton>button {{
             background-color: #4CAF50; /* Green */
@@ -66,7 +65,7 @@ model = LogisticRegression()
 model.fit(X_train, y_train)
 
 # Add background image
-add_bg_from_local('assets/background1.jpg', transparency=0.3)
+add_bg_from_local('assets/background1.jpg')
 
 # Streamlit UI
 st.title("Obesity Prediction App")
