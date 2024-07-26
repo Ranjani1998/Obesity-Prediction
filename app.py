@@ -14,7 +14,7 @@ def load_data():
     data = pd.read_csv(url, names=columns)
     return data
 
-# Function to add background image with proper fitting
+# Function to add background image with proper fitting and resolution
 def add_bg_from_local(image_file):
     with open(image_file, "rb") as image:
         encoded = base64.b64encode(image.read()).decode()
