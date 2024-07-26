@@ -14,7 +14,7 @@ def load_data():
     data = pd.read_csv(url, names=columns)
     return data
 
-# Function to add background image with transparency
+# Function to add background image with proper fitting
 def add_bg_from_local(image_file):
     with open(image_file, "rb") as image:
         encoded = base64.b64encode(image.read()).decode()
@@ -22,7 +22,7 @@ def add_bg_from_local(image_file):
         f"""
         <style>
         .stApp {{
-            background: linear-gradient(rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.5)), url(data:image/jpeg;base64,{encoded});
+            background: url(data:image/jpeg;base64,{encoded}) no-repeat center center fixed;
             background-size: cover;
         }}
         .stApp h1, .stApp h2, .stApp h3, .stApp h4, .stApp h5, .stApp h6, .stApp p {{
